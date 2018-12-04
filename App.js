@@ -1,11 +1,22 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {text: ''};
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
+        <Text>To Do List</Text>
+        <TextInput
+          style={{height: 40}}
+          placeholder="enter new task"
+          onChangeText={(text) => this.setState({text})}
+        />
+        <Text>new task: {this.state.text}</Text>
       </View>
     );
   }
