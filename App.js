@@ -4,19 +4,37 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {text: ''};
+    this.state = {
+      tasks: [],
+      newTask: ''
+    };
   }
+
+  addTask = (newTask) => {
+    this.setState({
+      tasks: this.state.tasks.concat([newTask]),
+      newTask: ''
+    });
+  };
+
+  taskList = (arr) => {
+    return arr.map(task =>
+      <Text>{task}</Text>
+    )
+  };
 
   render() {
     return (
       <View style={styles.container}>
         <Text>To Do List</Text>
         <TextInput
-          style={{height: 40}}
           placeholder="enter new task"
-          onChangeText={(text) => this.setState({text})}
+          returnKeyType='done'
+          value={this.state.newTask}
+          onChangeText={newTask => this.setState({newTask})}
+          onSubmitEditing={event => this.addTask(event.nativeEvent.text)}
         />
-        <Text>new task: {this.state.text}</Text>
+        {this.taskList(this.state.tasks)}
       </View>
     );
   }
