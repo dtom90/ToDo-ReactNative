@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, SafeAreaView, View, TextInput, Text  } from 'react-native';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -11,40 +11,65 @@ export default class App extends React.Component {
   }
 
   addTask = (newTask) => {
+    const numTasks = this.state.tasks.length;
     this.setState({
-      tasks: this.state.tasks.concat([newTask]),
+      tasks: this.state.tasks.concat([{
+        id: numTasks,
+        name: newTask
+      }]),
       newTask: ''
     });
   };
 
   taskList = (arr) => {
     return arr.map(task =>
-      <Text>{task}</Text>
+      <Text key={task.id}>{task.name}</Text>
     )
   };
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text>To Do List</Text>
-        <TextInput
-          placeholder="enter new task"
-          returnKeyType='done'
-          value={this.state.newTask}
-          onChangeText={newTask => this.setState({newTask})}
-          onSubmitEditing={event => this.addTask(event.nativeEvent.text)}
-        />
-        {this.taskList(this.state.tasks)}
-      </View>
+      <SafeAreaView style={styles.container}>
+
+        <View style={styles.headerSection}>
+          <Text>To Do List</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholder="enter new task"
+            returnKeyType='done'
+            value={this.state.newTask}
+            onChangeText={newTask => this.setState({newTask})}
+            onSubmitEditing={event => this.addTask(event.nativeEvent.text)}
+          />
+        </View>
+
+        <View style={styles.tasksSection}>
+          {this.taskList(this.state.tasks)}
+        </View>
+
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
+  },
+
+  headerSection: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  textInput: {height: 40},
+
+  tasksSection: {
+    flex: 4,
+    alignItems: 'center',
+  }
+
 });
