@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, View, TextInput, Text  } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, FlatList } from 'react-native';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -14,17 +14,11 @@ export default class App extends React.Component {
     const numTasks = this.state.tasks.length;
     this.setState({
       tasks: this.state.tasks.concat([{
-        id: numTasks,
+        key: numTasks.toString(),
         name: newTask
       }]),
       newTask: ''
     });
-  };
-
-  taskList = (arr) => {
-    return arr.map(task =>
-      <MyText style={styles.task} key={task.id}>{task.name}</MyText>
-    )
   };
 
   render() {
@@ -32,9 +26,9 @@ export default class App extends React.Component {
       <SafeAreaView style={styles.container}>
 
         <View style={styles.headerSection}>
-          <MyText style={{fontSize: 30}}>To Do List</MyText>
+          <MyText style={styles.titleText}>To Do List</MyText>
           <TextInput
-            style={styles.textInput}
+            style={mergeStyles([styles.textInput, styles.baseText, styles.task])}
             placeholder="enter new task"
             returnKeyType='done'
             value={this.state.newTask}
@@ -44,7 +38,10 @@ export default class App extends React.Component {
         </View>
 
         <View style={styles.tasksSection}>
-          {this.taskList(this.state.tasks)}
+          <FlatList
+            data={this.state.tasks}
+            renderItem={({item}) => <Task name={item.name}/>}
+          />
         </View>
 
       </SafeAreaView>
@@ -54,9 +51,17 @@ export default class App extends React.Component {
 
 class MyText extends React.Component {
   render() {
-    const mergedStyles = Object.assign(this.props.style || {}, styles.baseText);
+    const mergedStyles = mergeStyles([styles.baseText, this.props.style]);
     return (
       <Text style={mergedStyles}>{this.props.children}</Text>
+    );
+  }
+}
+
+class Task extends React.Component {
+  render() {
+    return (
+      <MyText style={styles.task}>{this.props.name}</MyText>
     );
   }
 }
@@ -70,31 +75,44 @@ const styles = StyleSheet.create({
 
   baseText: {
     fontFamily: 'Avenir',
+    fontSize: 20
   },
 
   headerSection: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center'
   },
 
   titleText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 30,
+    marginBottom: 20
   },
 
   textInput: {
-    fontFamily: 'Avenir',
-    height: 40
+    height: 50,
+    borderRadius: 5
   },
 
   tasksSection: {
     flex: 4,
-    alignItems: 'center',
   },
 
   task: {
-    margin: 10
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.125)',
+    marginLeft: 10,
+    marginRight: 10
   }
 
 });
+
+function mergeStyles(stylesArr) {
+  const mergedStyles = {};
+  for (let style of stylesArr){
+    Object.assign(mergedStyles, style);
+  }
+  return mergedStyles
+}
