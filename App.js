@@ -1,5 +1,8 @@
 import React from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TextInput, FlatList } from 'react-native';
+import { CheckBox } from 'react-native-elements'
+
+import '@expo/vector-icons';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -15,10 +18,17 @@ export default class App extends React.Component {
     this.setState({
       tasks: this.state.tasks.concat([{
         key: numTasks.toString(),
-        name: newTask
+        name: newTask,
+        completed: false
       }]),
       newTask: ''
     });
+  };
+
+  toggleCompleted = (key) => {
+    const tasks = this.state.tasks;
+    tasks[key].completed = !tasks[key].completed;
+    this.setState({tasks})
   };
 
   render() {
@@ -38,10 +48,14 @@ export default class App extends React.Component {
         </View>
 
         <View style={styles.tasksSection}>
-          <FlatList
-            data={this.state.tasks}
-            renderItem={({item}) => <Task name={item.name}/>}
-          />
+          <TaskList tasks={this.state.tasks.filter(t => !t.completed)}
+                    toggleCompleted={this.toggleCompleted} />
+        </View>
+
+        <View style={styles.tasksSection}>
+          <MyText style={styles.titleText}>Completed</MyText>
+          <TaskList tasks={this.state.tasks.filter(t => t.completed)}
+                    toggleCompleted={this.toggleCompleted} />
         </View>
 
       </SafeAreaView>
@@ -58,10 +72,31 @@ class MyText extends React.Component {
   }
 }
 
-class Task extends React.Component {
+class TaskList extends  React.PureComponent {
+
   render() {
     return (
-      <MyText style={styles.task}>{this.props.name}</MyText>
+      <FlatList
+        data={this.props.tasks}
+        renderItem={({item}) => <Task task={item} onToggle={this.props.toggleCompleted}/>}
+      />
+    );
+  }
+}
+
+class Task extends React.PureComponent {
+  onToggle = () => {
+    this.props.onToggle(this.props.task.key)
+  };
+
+  render() {
+    return (
+      <CheckBox
+        title={this.props.task.name}
+        textStyle={styles.baseText}
+        checked={this.props.task.completed}
+        onPress={this.onToggle}
+      />
     );
   }
 }
@@ -96,7 +131,7 @@ const styles = StyleSheet.create({
   },
 
   tasksSection: {
-    flex: 4,
+    flex: 2,
   },
 
   task: {
